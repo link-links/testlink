@@ -3,19 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIN_4IK</title>
+<title>MIN_4IK - SYSTEM HACK</title>
 
 <style>
 /* ==========================
    Стили страницы
-   ==========================
-   body: фон и основной шрифт
-   #matrix: canvas для падающего кода
-   .container: блок с терминалом и кнопками
-   .terminal: рамка вокруг текста
-   .line: отдельная строка текста
-   .button: кнопки с ссылками
-   .cursor: мигающий курсор
 ========================== */
 body {
     margin: 0;
@@ -23,207 +15,218 @@ body {
     color: #00ff00; /* цвет текста */
     font-family: monospace; /* терминальный шрифт */
     overflow: hidden;
-    height: 100vh;
 }
 
-#matrix {
+/* Canvas для падающего Matrix кода */
+canvas {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0; /* ниже всех элементов */
+    z-index: -1; /* позади всего контента */
 }
 
+/* Контейнер с терминалом и кнопками */
 .container {
-    position: relative;
-    z-index: 1; /* поверх падающего кода */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
-    padding-top: 50px;
 }
 
-h1 {
-    font-size: 28px;
-    margin-bottom: 20px;
-    text-shadow: 0 0 10px #00ff00; /* светящийся эффект */
+/* Терминал */
+#terminal {
+    padding: 20px;
+    white-space: pre-wrap; /* перенос строк */
+    line-height: 1.4;
 }
 
-.terminal {
-    border: 1px solid #00ff00;
+/* Кнопки */
+.btn {
     display: inline-block;
-    padding: 15px;
-    min-width: 260px;
-}
-
-.line {
-    margin: 6px 0;
-}
-
-.button {
-    display: block;
+    margin: 8px;
+    padding: 10px 20px;
+    border: 1px solid #00ff00;
+    border-radius: 6px;
     color: #00ff00;
     text-decoration: none;
-    padding: 6px;
-    border: 1px solid #00ff00;
-    margin-top: 8px;
-    transition: 0.2s;
+    transition: 0.3s;
 }
 
-.button:hover {
+.btn:hover {
     background: #00ff00;
     color: black;
+    box-shadow: 0 0 15px #00ff00;
 }
 
+/* Мигающий курсор */
 .cursor {
     display: inline-block;
-    width: 8px;
-    background: #00ff00;
+    width: 10px;
+    background-color: #00ff00;
     animation: blink 1s infinite;
 }
 
 @keyframes blink {
-    50% { opacity: 0; }
+    0%,50%,100% { background-color: #00ff00; }
+    25%,75% { background-color: black; }
 }
 </style>
 </head>
+
 <body>
 
-<!-- Canvas для падающего кода -->
+<!-- ==========================
+     Canvas для падающего Matrix
+========================== -->
 <canvas id="matrix"></canvas>
 
+<!-- Контейнер терминала и кнопок -->
 <div class="container">
-    <h1>MIN_4IK</h1>
-
-    <div class="terminal">
-        <div id="typed" class="line"></div> <!-- Здесь печатается текст -->
-        <div id="scan" class="line"></div>  <!-- Здесь отображается fake scan/loading -->
-        <div class="line"><span class="cursor"></span></div> <!-- Мигающий курсор -->
-        <div id="buttons"></div> <!-- Здесь будут кнопки -->
-    </div>
+    <div id="terminal"></div> <!-- Здесь печатается текст -->
+    <div id="buttons" style="margin-top:20px;"></div> <!-- Здесь кнопки -->
 </div>
 
-<!-- Аудио: loop музыка и звук печати -->
-<audio id="bgMusic" preload="auto" loop src="https://cdn.pixabay.com/audio/2023/07/31/audio_1e1d66.mp3"></audio>
-<audio id="typeSound" preload="auto" muted src="https://pixabay.com/static/uploads/sound-effects/keyboard-typing-sound-247417.mp3"></audio>
+<!-- ==========================
+     Loop хакерской печати
+========================== -->
+<audio id="hackSound" loop preload="auto" muted>
+    <source src="https://pixabay.com/static/uploads/sound-effects/keyboard-typing-sound-247417.mp3" type="audio/mpeg">
+</audio>
 
 <script>
 // ============================
-// 1. Падающий код (Matrix)
+// 1. Matrix падающий код
 // ============================
+
+// Получаем canvas
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
+
+// Устанавливаем размер canvas
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
-const fontSize = 16;
-const columns = canvas.width / fontSize;
-const drops = [];
-for(let x=0; x<columns; x++) drops[x] = Math.random() * canvas.height;
+// Символы для падающего кода
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 14;
+const columns = Math.floor(canvas.width / fontSize);
 
-// Функция рисует падающие буквы
+// Массив для каждой колонки (drop)
+const drops = Array.from({length: columns}, () => 1);
+
+// Функция рисует падающий Matrix код
 function drawMatrix() {
-    ctx.fillStyle = "rgba(0,0,0,0.05)"; // полупрозрачный след
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#00ff00";
+    ctx.fillStyle = "rgba(0,0,0,0.05)"; // прозрачный след
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#00ff00"; // цвет символов
     ctx.font = fontSize + "px monospace";
 
-    for(let i=0; i<drops.length; i++){
-        const text = letters.charAt(Math.floor(Math.random()*letters.length));
-        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-        if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-        drops[i]++;
-    }
+    drops.forEach((y,i)=>{
+        const text = letters[Math.floor(Math.random()*letters.length)];
+        ctx.fillText(text, i*fontSize, y*fontSize);
+        drops[i] = y*fontSize > canvas.height && Math.random()>0.975 ? 0 : y+1;
+    });
+
+    requestAnimationFrame(drawMatrix); // рекурсивно
 }
-setInterval(drawMatrix, 50); 
+
+drawMatrix();
 
 // ============================
-// 2. Loop музыка + звук печати
+// 2. Loop хакерской печати
 // ============================
-const bgMusic = document.getElementById("bgMusic"); // loop музыка
-const sound = document.getElementById("typeSound"); // звук печати
+
+// Получаем audio элемент
+const hackSound = document.getElementById("hackSound");
 let soundEnabled = false;
 
-// Первый клик пользователя — включаем музыку и разрешаем звук
-document.body.addEventListener("click", function initSound() {
+// Первый клик пользователя разрешает звук
+document.body.addEventListener("click", ()=>{
     if(!soundEnabled){
         soundEnabled = true;
-        bgMusic.play().catch(e=>console.log(e)); // запускаем loop музыку
-        sound.muted = false;
-        sound.currentTime = 0;
-        sound.play().catch(e=>console.log(e)); // один раз для разблокировки браузером
-        document.body.removeEventListener("click", initSound);
-        console.log("Звук разрешен и музыка запущена");
+        hackSound.muted = false;
+        hackSound.play().catch(e=>console.log(e));
+        console.log("Звук печати активирован");
     }
 });
 
-// Функция проигрывания короткого звука печати (для текста и кнопок)
+// Функция проигрывания короткого звука печати
 function playTypeSound(){
     if(soundEnabled){
-        const clone = sound.cloneNode(); // клонируем, чтобы браузер разрешил звук в setTimeout
+        const clone = hackSound.cloneNode(); // клонируем, чтобы браузер разрешил
         clone.play();
     }
 }
 
 // ============================
-// 3. Печатающийся текст
+// 3. Печатающийся текст с мигающим курсором
 // ============================
-const message = "system://loading profile... access granted ✔ user: MIN_4IK";
-let index = 0;
-const typed = document.getElementById("typed");
 
-function typeText() {
-    if(index < message.length){
-        typed.innerHTML += message.charAt(index);
-        playTypeSound(); // звук печати
-        index++;
-        setTimeout(typeText, 50);
-    } else startScan();
-}
-typeText();
+// terminal — куда выводим текст
+const terminal = document.getElementById("terminal");
 
-// ============================
-// 4. Fake scan/loading
-// ============================
-const scan = document.getElementById("scan");
-const scanLines = [
-    "scanning files... [#####     ]",
-    "loading modules... [###       ]",
-    "checking system integrity... [######  ]",
-    "virus detected: 0",
-    "loading complete ✔"
+// Здесь можно менять строки текста
+const lines = [
+    "[SYSTEM ONLINE]",
+    "[ACCESSING MIN_4IK NETWORK...]",
+    "[FIREWALL BYPASSED]",
+    "[LOADING USER DATA...]",
+    "[SUCCESS]",
+    "[WELCOME, OPERATOR]"
 ];
-let scanIndex = 0;
 
-function startScan(){
-    if(scanIndex < scanLines.length){
-        scan.innerHTML += scanLines[scanIndex]+"<br>";
+let i=0; // текущая строка
+function typeLine(line, callback){
+    let j=0; // индекс символа
+    const interval = setInterval(()=>{
+        terminal.innerHTML += line[j];
         playTypeSound(); // звук печати
-        scanIndex++;
-        setTimeout(startScan, 500);
+        j++;
+        if(j>=line.length){
+            clearInterval(interval);
+            terminal.innerHTML += "\n"; // переход на новую строку
+            if(callback) callback();
+        }
+    },50); // скорость печати (мс)
+}
+
+function typeLines(){
+    if(i<lines.length){
+        typeLine(lines[i], ()=>{ i++; typeLines(); });
+    } else {
+        // добавляем мигающий курсор после текста
+        terminal.innerHTML += '<span class="cursor"></span>';
     }
 }
 
+typeLines();
+
 // ============================
-// 5. Кнопки с ссылками и звуком
+// 4. Кнопки (неограниченное количество)
 // ============================
-const links = [
-    {name: "Telegram", url: "#"}, // название и ссылка кнопки
-    {name: "YouTube", url: "#"},
-    {name: "Discord", url: "#"}
+
+// Здесь можно добавлять/удалять кнопки
+const buttons = [
+    {name:"Telegram", url:"https://t.me/min_4ik"},
+    {name:"YouTube", url:"https://www.youtube.com/@min4ik"},
+    {name:"Discord", url:"https://discord.com/users/424203787234967564"},
+    {name:"Twitch", url:"https://www.twitch.tv/min_4ik"},
+    {name:"TikTok", url:"https://www.tiktok.com/@min_44ik"},
+    {name:"ВКонтакте", url:"https://vk.com/min_4ik"}
 ];
+
+// Контейнер для кнопок
 const container = document.getElementById("buttons");
 
-links.forEach(link=>{
+// Создание кнопок с звуком при клике
+buttons.forEach(btn=>{
     const a = document.createElement("a");
-    a.className = "button";
-    a.href = link.url;
-    a.innerText = "> " + link.name;
+    a.className = "btn";
+    a.href = btn.url;
+    a.innerText = btn.name;
     a.target = "_blank";
-
-    // звук при нажатии на кнопку
-    a.addEventListener("click", ()=>playTypeSound());
-
+    a.addEventListener("click", playTypeSound); // звук при клике
     container.appendChild(a);
 });
 </script>
