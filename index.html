@@ -11,7 +11,7 @@
 ========================== */
 body {
     margin: 0;
-    background: black; /* фон страницы */
+    background: black; /* фон */
     color: #00ff00; /* основной цвет текста */
     font-family: monospace; /* терминальный шрифт */
     overflow: hidden;
@@ -70,7 +70,7 @@ h1 {
     display: inline-block;
     width: 8px;
     background: #00ff00;
-    animation: blink 1s infinite; /* мигание курсора */
+    animation: blink 1s infinite; /* мигающий курсор */
 }
 
 @keyframes blink {
@@ -85,41 +85,36 @@ h1 {
 <canvas id="matrix"></canvas>
 
 <div class="container">
-    <!-- Заголовок страницы -->
     <h1>MIN_4IK</h1>
 
-    <!-- Терминальный блок -->
     <div class="terminal">
-        <div id="typed" class="line"></div> <!-- Здесь печатается текст -->
-        <div id="scan" class="line"></div>  <!-- Здесь выводится fake scan/loading -->
-        <div class="line"><span class="cursor"></span></div> <!-- Мигающий курсор -->
-        <div id="buttons"></div> <!-- Здесь будут кнопки -->
+        <div id="typed" class="line"></div> <!-- печатающийся текст -->
+        <div id="scan" class="line"></div>  <!-- fake scan/loading -->
+        <div class="line"><span class="cursor"></span></div> <!-- мигающий курсор -->
+        <div id="buttons"></div> <!-- кнопки -->
     </div>
 </div>
 
-<!-- Звук печати -->
+<!-- Аудио печати -->
 <audio id="typeSound" preload="auto" muted src="https://pixabay.com/static/uploads/sound-effects/keyboard-typing-sound-247417.mp3"></audio>
 
 <script>
 // ============================
-// 1. Падающий код (Matrix) - визуальный фон
+// 1. Падающий код (Matrix)
 // ============================
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Буквы для эффекта "Матрицы"
 const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
 const fontSize = 16;
 const columns = canvas.width / fontSize;
 const drops = [];
 for(let x=0; x<columns; x++) drops[x] = Math.random() * canvas.height;
 
-// Функция рисует падающие буквы
 function drawMatrix() {
-    ctx.fillStyle = "rgba(0,0,0,0.05)"; // легкий след
+    ctx.fillStyle = "rgba(0,0,0,0.05)"; 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#00ff00";
     ctx.font = fontSize + "px monospace";
@@ -140,32 +135,34 @@ const message = "system://loading profile... access granted ✔ user: MIN_4IK";
 let index = 0;
 const typed = document.getElementById("typed");
 const sound = document.getElementById("typeSound");
-let soundEnabled = false; // пока звук не разрешён
+let soundEnabled = false;
 
-// Включение звука при первом клике пользователя
-document.addEventListener("click", function() {
-    if(!soundEnabled){
-        sound.muted = false; // разрешаем звук
+// =========
+// Включение звука при первом клике по странице
+// =========
+document.body.addEventListener("click", function initSound() {
+    if (!soundEnabled) {
+        sound.muted = false; // разблокируем звук
         soundEnabled = true;
-        console.log("Звук активирован!");
+        // сразу проигрываем звук один раз, чтобы браузер разрешил его
         sound.currentTime = 0;
-        sound.play();
+        sound.play().catch(e => console.log("Ошибка воспроизведения:", e));
+        document.body.removeEventListener("click", initSound); // удаляем обработчик
+        console.log("Звук разрешен");
     }
 });
 
-// Функция печати текста по буквам
+// Функция печати текста с эффектом терминала
 function typeText() {
     if(index < message.length){
         typed.innerHTML += message.charAt(index);
-        if(soundEnabled){ // проигрываем звук только после активации
+        if(soundEnabled){
             sound.currentTime = 0;
             sound.play();
         }
         index++;
         setTimeout(typeText, 50);
-    } else {
-        startScan(); // запускаем fake scan после текста
-    }
+    } else startScan();
 }
 typeText();
 
@@ -182,7 +179,6 @@ const scanLines = [
 ];
 let scanIndex = 0;
 
-// Выводим строки с задержкой
 function startScan() {
     if(scanIndex < scanLines.length){
         scan.innerHTML += scanLines[scanIndex] + "<br>";
@@ -208,7 +204,7 @@ links.forEach(link => {
     a.innerText = "> " + link.name;
     a.target = "_blank";
 
-    // Воспроизведение звука при клике на кнопку
+    // Звук при нажатии на кнопку
     a.addEventListener("click", function(){
         if(soundEnabled){
             sound.currentTime = 0;
