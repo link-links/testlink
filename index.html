@@ -6,7 +6,9 @@
 <title>MIN_4IK</title>
 
 <style>
-/* Стили страницы — тёмный фон, терминальный вид */
+/* ==========================
+   Стили страницы
+========================== */
 body {
     margin: 0;
     background: black;
@@ -14,34 +16,31 @@ body {
     font-family: monospace;
     overflow: hidden;
     height: 100vh;
+    cursor: default;
 }
 
-/* Это canvas для падающего кода */
 #matrix {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0; /* позади текста */
+    z-index: 0;
 }
 
-/* Основной контейнер — текст + кнопки */
 .container {
     position: relative;
-    z-index: 1; /* поверх кода */
+    z-index: 1;
     text-align: center;
     padding-top: 50px;
 }
 
-/* Имя/заголовок */
 h1 {
     font-size: 28px;
     margin-bottom: 20px;
     text-shadow: 0 0 10px #00ff00;
 }
 
-/* Терминальный блок */
 .terminal {
     border: 1px solid #00ff00;
     display: inline-block;
@@ -49,12 +48,10 @@ h1 {
     min-width: 260px;
 }
 
-/* Строки текста в терминале */
 .line {
     margin: 6px 0;
 }
 
-/* Кнопки в стиле командной строки */
 .button {
     display: block;
     color: #00ff00;
@@ -70,7 +67,6 @@ h1 {
     color: black;
 }
 
-/* Мерцающий курсор */
 .cursor {
     display: inline-block;
     width: 8px;
@@ -89,30 +85,27 @@ h1 {
 <canvas id="matrix"></canvas>
 
 <div class="container">
-    <!-- Имя страницы -->
     <h1>MIN_4IK</h1>
 
-    <!-- Терминальный вывод -->
     <div class="terminal">
+        <!-- Печатающийся текст -->
         <div id="typed" class="line"></div>
+        <!-- Fake scan/loading -->
         <div id="scan" class="line"></div>
+        <!-- Мигающий курсор -->
         <div class="line"><span class="cursor"></span></div>
+        <!-- Кнопки -->
         <div id="buttons"></div>
     </div>
 </div>
 
-<!--  
-Аудио-контейнер со звуком печати.
-Этот mp3 — реалистичный звук клавиатурной печати (keyboard typing sound), 
-подходит для хакерской атмосферы. 2
-Можно заменить на свою ссылку, если хочешь другой звук.
--->
+<!-- Аудио-контейнер со звуком печати -->
 <audio id="typeSound" src="https://pixabay.com/static/uploads/sound-effects/keyboard-typing-sound-247417.mp3"></audio>
 
 <script>
-// ---------------------------
-// 1. Падающий код (Матрица)
-// ---------------------------
+// ============================
+// 1. Падающий код (Matrix)
+// ============================
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 
@@ -123,7 +116,7 @@ const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
 const fontSize = 16;
 const columns = canvas.width / fontSize;
 const drops = [];
-for(let x = 0; x < columns; x++) drops[x] = Math.random() * canvas.height;
+for(let x=0; x<columns; x++) drops[x] = Math.random() * canvas.height;
 
 function drawMatrix() {
     ctx.fillStyle = "rgba(0,0,0,0.05)";
@@ -140,31 +133,45 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 50);
 
-// ---------------------------
+// ============================
 // 2. Печатающийся текст + звук
-// ---------------------------
+// ============================
 const message = "system://loading profile... access granted ✔ user: MIN_4IK";
 let index = 0;
 const typed = document.getElementById("typed");
 const sound = document.getElementById("typeSound");
 
-// Функция печати по буквам
+// переменная для активации звука после клика
+let soundEnabled = false;
+
+// слушаем первый клик по странице для активации звука
+document.addEventListener("click", function() {
+    if(!soundEnabled){
+        soundEnabled = true;
+        console.log("Звук активирован!");
+        sound.play();
+    }
+});
+
+// функция печати с проверкой активации звука
 function typeText() {
     if(index < message.length){
         typed.innerHTML += message.charAt(index);
-        sound.currentTime = 0; // звук с начала
-        sound.play(); // проигрываем звук
+        if(soundEnabled){
+            sound.currentTime = 0;
+            sound.play();
+        }
         index++;
-        setTimeout(typeText, 50); // скорость печати
+        setTimeout(typeText, 50);
     } else {
-        startScan(); // запускаем fake сканирование
+        startScan();
     }
 }
 typeText();
 
-// ---------------------------
+// ============================
 // 3. Fake scanning/loading
-// ---------------------------
+// ============================
 const scan = document.getElementById("scan");
 const scanLines = [
     "scanning files... [#####     ]",
@@ -179,13 +186,13 @@ function startScan() {
     if(scanIndex < scanLines.length){
         scan.innerHTML += scanLines[scanIndex] + "<br>";
         scanIndex++;
-        setTimeout(startScan, 500); // задержка между строками
+        setTimeout(startScan, 500);
     }
 }
 
-// ---------------------------
+// ============================
 // 4. Кнопки (ссылки)
-// ---------------------------
+// ============================
 const links = [
     {name: "Telegram", url: "#"},
     {name: "YouTube", url: "#"},
@@ -199,6 +206,15 @@ links.forEach(link => {
     a.href = link.url;
     a.innerText = "> " + link.name;
     a.target = "_blank";
+    
+    // добавляем воспроизведение звука при клике на кнопку
+    a.addEventListener("click", function(){
+        if(soundEnabled){
+            sound.currentTime = 0;
+            sound.play();
+        }
+    });
+
     container.appendChild(a);
 });
 </script>
