@@ -8,23 +8,31 @@
 <style>
 /* ==========================
    Стили страницы
+   ==========================
+   body: фон и основной шрифт
+   #matrix: canvas для падающего кода
+   .container: блок с терминалом и кнопками
+   .terminal: рамка вокруг текста
+   .line: отдельная строка текста
+   .button: кнопки с ссылками
+   .cursor: мигающий курсор
 ========================== */
 body {
     margin: 0;
-    background: black; /* фон */
-    color: #00ff00; /* основной цвет текста */
+    background: black; /* фон страницы */
+    color: #00ff00; /* цвет текста */
     font-family: monospace; /* терминальный шрифт */
     overflow: hidden;
     height: 100vh;
 }
 
 #matrix {
-    position: fixed; /* canvas на заднем плане */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0;
+    z-index: 0; /* ниже всех элементов */
 }
 
 .container {
@@ -37,18 +45,18 @@ body {
 h1 {
     font-size: 28px;
     margin-bottom: 20px;
-    text-shadow: 0 0 10px #00ff00; /* светящийся заголовок */
+    text-shadow: 0 0 10px #00ff00; /* светящийся эффект */
 }
 
 .terminal {
-    border: 1px solid #00ff00; /* рамка терминала */
+    border: 1px solid #00ff00;
     display: inline-block;
     padding: 15px;
     min-width: 260px;
 }
 
 .line {
-    margin: 6px 0; /* отступы между строками */
+    margin: 6px 0;
 }
 
 .button {
@@ -62,7 +70,7 @@ h1 {
 }
 
 .button:hover {
-    background: #00ff00; /* эффект при наведении */
+    background: #00ff00;
     color: black;
 }
 
@@ -70,7 +78,7 @@ h1 {
     display: inline-block;
     width: 8px;
     background: #00ff00;
-    animation: blink 1s infinite; /* мигающий курсор */
+    animation: blink 1s infinite;
 }
 
 @keyframes blink {
@@ -78,7 +86,6 @@ h1 {
 }
 </style>
 </head>
-
 <body>
 
 <!-- Canvas для падающего кода -->
@@ -88,14 +95,15 @@ h1 {
     <h1>MIN_4IK</h1>
 
     <div class="terminal">
-        <div id="typed" class="line"></div> <!-- печатающийся текст -->
-        <div id="scan" class="line"></div>  <!-- fake scan/loading -->
-        <div class="line"><span class="cursor"></span></div> <!-- мигающий курсор -->
-        <div id="buttons"></div> <!-- кнопки -->
+        <div id="typed" class="line"></div> <!-- Здесь печатается текст -->
+        <div id="scan" class="line"></div>  <!-- Здесь отображается fake scan/loading -->
+        <div class="line"><span class="cursor"></span></div> <!-- Мигающий курсор -->
+        <div id="buttons"></div> <!-- Здесь будут кнопки -->
     </div>
 </div>
 
-<!-- Аудио печати -->
+<!-- Аудио: loop музыка и звук печати -->
+<audio id="bgMusic" preload="auto" loop src="https://cdn.pixabay.com/audio/2023/07/31/audio_1e1d66.mp3"></audio>
 <audio id="typeSound" preload="auto" muted src="https://pixabay.com/static/uploads/sound-effects/keyboard-typing-sound-247417.mp3"></audio>
 
 <script>
@@ -113,8 +121,9 @@ const columns = canvas.width / fontSize;
 const drops = [];
 for(let x=0; x<columns; x++) drops[x] = Math.random() * canvas.height;
 
+// Функция рисует падающие буквы
 function drawMatrix() {
-    ctx.fillStyle = "rgba(0,0,0,0.05)"; 
+    ctx.fillStyle = "rgba(0,0,0,0.05)"; // полупрозрачный след
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#00ff00";
     ctx.font = fontSize + "px monospace";
@@ -129,37 +138,44 @@ function drawMatrix() {
 setInterval(drawMatrix, 50); 
 
 // ============================
-// 2. Печатающийся текст + звук
+// 2. Loop музыка + звук печати
+// ============================
+const bgMusic = document.getElementById("bgMusic"); // loop музыка
+const sound = document.getElementById("typeSound"); // звук печати
+let soundEnabled = false;
+
+// Первый клик пользователя — включаем музыку и разрешаем звук
+document.body.addEventListener("click", function initSound() {
+    if(!soundEnabled){
+        soundEnabled = true;
+        bgMusic.play().catch(e=>console.log(e)); // запускаем loop музыку
+        sound.muted = false;
+        sound.currentTime = 0;
+        sound.play().catch(e=>console.log(e)); // один раз для разблокировки браузером
+        document.body.removeEventListener("click", initSound);
+        console.log("Звук разрешен и музыка запущена");
+    }
+});
+
+// Функция проигрывания короткого звука печати (для текста и кнопок)
+function playTypeSound(){
+    if(soundEnabled){
+        const clone = sound.cloneNode(); // клонируем, чтобы браузер разрешил звук в setTimeout
+        clone.play();
+    }
+}
+
+// ============================
+// 3. Печатающийся текст
 // ============================
 const message = "system://loading profile... access granted ✔ user: MIN_4IK";
 let index = 0;
 const typed = document.getElementById("typed");
-const sound = document.getElementById("typeSound");
-let soundEnabled = false;
 
-// =========
-// Включение звука при первом клике по странице
-// =========
-document.body.addEventListener("click", function initSound() {
-    if (!soundEnabled) {
-        sound.muted = false; // разблокируем звук
-        soundEnabled = true;
-        // сразу проигрываем звук один раз, чтобы браузер разрешил его
-        sound.currentTime = 0;
-        sound.play().catch(e => console.log("Ошибка воспроизведения:", e));
-        document.body.removeEventListener("click", initSound); // удаляем обработчик
-        console.log("Звук разрешен");
-    }
-});
-
-// Функция печати текста с эффектом терминала
 function typeText() {
     if(index < message.length){
         typed.innerHTML += message.charAt(index);
-        if(soundEnabled){
-            sound.currentTime = 0;
-            sound.play();
-        }
+        playTypeSound(); // звук печати
         index++;
         setTimeout(typeText, 50);
     } else startScan();
@@ -167,7 +183,7 @@ function typeText() {
 typeText();
 
 // ============================
-// 3. Fake scanning/loading
+// 4. Fake scan/loading
 // ============================
 const scan = document.getElementById("scan");
 const scanLines = [
@@ -179,38 +195,34 @@ const scanLines = [
 ];
 let scanIndex = 0;
 
-function startScan() {
+function startScan(){
     if(scanIndex < scanLines.length){
-        scan.innerHTML += scanLines[scanIndex] + "<br>";
+        scan.innerHTML += scanLines[scanIndex]+"<br>";
+        playTypeSound(); // звук печати
         scanIndex++;
         setTimeout(startScan, 500);
     }
 }
 
 // ============================
-// 4. Кнопки (ссылки + звук при клике)
+// 5. Кнопки с ссылками и звуком
 // ============================
 const links = [
-    {name: "Telegram", url: "#"},
+    {name: "Telegram", url: "#"}, // название и ссылка кнопки
     {name: "YouTube", url: "#"},
     {name: "Discord", url: "#"}
 ];
-
 const container = document.getElementById("buttons");
-links.forEach(link => {
+
+links.forEach(link=>{
     const a = document.createElement("a");
     a.className = "button";
     a.href = link.url;
     a.innerText = "> " + link.name;
     a.target = "_blank";
 
-    // Звук при нажатии на кнопку
-    a.addEventListener("click", function(){
-        if(soundEnabled){
-            sound.currentTime = 0;
-            sound.play();
-        }
-    });
+    // звук при нажатии на кнопку
+    a.addEventListener("click", ()=>playTypeSound());
 
     container.appendChild(a);
 });
