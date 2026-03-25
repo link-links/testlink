@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIN_4IK</title>
+
+<style>
+/* ================================
+   Стили страницы
+   ================================ */
+body {
+    margin: 0;                  /* убираем отступы браузера */
+    background: black;          /* основной фон */
+    color: #00ff00;             /* цвет текста */
+    font-family: monospace;     /* терминальный шрифт */
+    overflow: hidden;
+    height: 100vh;
+}
+
+/* Canvas для падающего кода */
+#matrix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;                 /* на заднем плане */
+}
+
+/* Основной контейнер с текстом и кнопками */
+.container {
+    position: relative;
+    z-index: 1;                 /* поверх падающего кода */
+    text-align: center;
+    padding-top: 50px;
+}
+
+/* Имя/заголовок страницы */
+h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #00ff00;
+}
+
+/* Терминальный блок */
+.terminal {
+    border: 1px solid #00ff00;
+    display: inline-block;
+    padding: 15px;
+    min-width: 260px;
+}
+
+/* Строки текста внутри терминала */
+.line {
+    margin: 6px 0;
+}
+
+/* Кнопки в стиле терминала */
+.button {
+    display: block;
+    color: #00ff00;
+    text-decoration: none;
+    padding: 6px;
+    border: 1px solid #00ff00;
+    margin-top: 8px;
+    transition: 0.2s;
+}
+
+.button:hover {
+    background: #00ff00;
+    color: black;
+}
+
+/* Мигающий курсор */
+.cursor {
+    display: inline-block;
+    width: 8px;
+    background: #00ff00;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================================
+     Canvas для падающего кода
+     ================================ -->
+<canvas id="matrix"></canvas>
+
+<!-- ================================
+     Основной контейнер с терминалом
+     ================================ -->
+<div class="container">
+    <!-- ============================
+         Имя страницы / пользователя
+         Меняй здесь на любое
+    ============================ -->
+    <h1>MIN_4IK</h1>
+
+    <!-- ============================
+         Терминальный блок
+    ============================ -->
+    <div class="terminal">
+        <!-- Печатающийся текст -->
+        <div id="typed" class="line"></div>
+
+        <!-- Fake scan/loading -->
+        <div id="scan" class="line"></div>
+
+        <!-- Мигающий курсор -->
+        <div class="line"><span class="cursor"></span></div>
+
+        <!-- Здесь будут кнопки -->
+        <div id="buttons"></div>
+    </div>
+</div>
+
+<!-- ================================
+     Звук печати
+     Меняй src на свой файл, если нужно
+=============================== -->
+<audio id="typeSound" src="https://freesound.org/data/previews/415/415209_5121236-lq.mp3"></audio>
+
+<script>
+// ================================
+// 1. Падающий код (Matrix)
+// ================================
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+// размеры canvas
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// символы для “падающего кода”
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%";
+const fontSize = 16;
+const columns = canvas.width / fontSize;
+
+// массив для текущих позиций “капель”
+const drops = [];
+for(let x=0; x<columns; x++) drops[x] = Math.random() * canvas.height;
+
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0,0,0,0.05)"; // прозрачный фон для эффекта следа
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#00ff00";
+    ctx.font = fontSize + "px monospace";
+
+    for(let i=0; i<drops.length; i++){
+        const text = letters.charAt(Math.floor(Math.random()*letters.length));
+        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+        if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+    }
+}
+setInterval(drawMatrix, 50); // рисуем каждые 50мс
+
+// ================================
+// 2. Печатающийся текст + звук
+// ================================
+const message = "system://loading profile... access granted ✔ user: MIN_4IK"; // текст для печати
+let index = 0;
+const typed = document.getElementById("typed");
+const sound = document.getElementById("typeSound");
+
+function typeText() {
+    if(index < message.length){
+        typed.innerHTML += message.charAt(index);
+        sound.currentTime = 0; // звук с начала
+        sound.play();
+        index++;
+        setTimeout(typeText, 50); // скорость печати
+    } else {
+        startScan(); // после текста запускаем сканирование
+    }
+}
+typeText();
+
+// ================================
+// 3. Fake scanning / loading
+// ================================
+const scan = document.getElementById("scan");
+const scanLines = [
+    "scanning files... [#####     ]",
+    "loading modules... [###       ]",
+    "checking system integrity... [######  ]",
+    "virus detected: 0",
+    "loading complete ✔"
+];
+let scanIndex = 0;
+
+function startScan() {
+    if(scanIndex < scanLines.length){
+        scan.innerHTML += scanLines[scanIndex] + "<br>";
+        scanIndex++;
+        setTimeout(startScan, 500); // скорость появления строк
+    }
+}
+
+// ================================
+// 4. Кнопки
+// ================================
+const links = [
+    {name: "Telegram", url: "#"}, // название и ссылка кнопки
+    {name: "YouTube", url: "#"},
+    {name: "Discord", url: "#"}
+];
+
+const container = document.getElementById("buttons");
+links.forEach(link => {
+    const a = document.createElement("a");
+    a.className = "button";
+    a.href = link.url;
+    a.innerText = "> " + link.name; // > делает вид командной строки
+    a.target = "_blank";
+    container.appendChild(a);
+});
+</script>
+
+</body>
+</html>
