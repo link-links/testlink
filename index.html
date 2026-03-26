@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>min_4ik</title>
+<title>min_4x</title>
 
 <style>
 body, html {
@@ -75,12 +75,12 @@ canvas { position: fixed; top: 0; left: 0; z-index: 0; }
 
 <!-- Контейнер для кнопок -->
 <div class="container">
-    <h1>min_4ik</h1>
+    <h1>min_4x</h1>
     <div id="buttonsContainer"></div>
 </div>
 
-<!-- Фоновая музыка (играет постоянно) -->
-<audio id="backgroundMusic" src="background.mp3" loop autoplay></audio>
+<!-- Фоновая музыка -->
+<audio id="backgroundMusic" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
 <script>
 /* ==============================
@@ -122,8 +122,9 @@ function drawMatrix() {
         if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
     }
+    requestAnimationFrame(drawMatrix);
 }
-setInterval(drawMatrix, 33);
+drawMatrix();
 
 /* ==============================
       Динамическое добавление кнопок
@@ -146,7 +147,7 @@ buttons.forEach(b => {
     a.className = 'btn';
     buttonsContainer.appendChild(a);
 
-    // Клик по кнопке запускает только взлом-анимацию, фон продолжает играть
+    // Клик запускает только взлом-анимацию, фон продолжает играть
     a.addEventListener('click', () => {
         triggerHackAnimation();
     });
@@ -179,33 +180,4 @@ function triggerHackAnimation() {
 
     let count = 0;
     function animate() {
-        hc.fillStyle = "rgba(0,0,0,0.1)";
-        hc.fillRect(0,0,hackCanvas.width,hackCanvas.height);
-        hc.fillStyle = "#00ff00";
-        hc.font = "20px monospace";
-        particles.forEach(p => {
-            hc.fillText(p.char, p.x, p.y);
-            p.y += p.speedY;
-            if (p.y > hackCanvas.height) p.y = 0;
-        });
-        count++;
-        if (count < 60) requestAnimationFrame(animate);
-        else hackCanvas.remove();
-    }
-    animate();
-}
-
-/* ==============================
-      Что тут наделано
-==============================
-1. Черный фон, зеленый текст, Matrix на заднем плане.
-2. Фейковая загрузка с процентами 0-100%.
-3. Контейнер с рамкой и кнопками.
-4. Кнопки создаются через массив JS — любое количество.
-5. Клик по кнопке запускает взлом-анимацию, фон продолжает играть.
-6. Фоновая музыка background.mp3 играет автоматически и бесконечно (loop).
-7. Ты можешь заменить background.mp3 на свою музыку в папке рядом с index.html.
-*/
-</script>
-</body>
-</html>
+        hc.fill
