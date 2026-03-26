@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>min_4x</title>
+<title>MIN_4IK - SYSTEM HACK</title>
 
 <style>
 body, html {
@@ -75,7 +75,7 @@ canvas { position: fixed; top: 0; left: 0; z-index: 0; }
 
 <!-- Контейнер для кнопок -->
 <div class="container">
-    <h1>min_4x</h1>
+    <h1>MIN_4IK</h1>
     <div id="buttonsContainer"></div>
 </div>
 
@@ -127,7 +127,7 @@ function drawMatrix() {
 drawMatrix();
 
 /* ==============================
-      Динамическое добавление кнопок
+      Динамические кнопки (любое количество)
 ============================== */
 const buttons = [
     {text: "Telegram", link: "https://t.me/ТВОЙ_ТГ"},
@@ -147,7 +147,7 @@ buttons.forEach(b => {
     a.className = 'btn';
     buttonsContainer.appendChild(a);
 
-    // Клик запускает только взлом-анимацию, фон продолжает играть
+    // Клик запускает только взлом-анимацию
     a.addEventListener('click', () => {
         triggerHackAnimation();
     });
@@ -180,4 +180,29 @@ function triggerHackAnimation() {
 
     let count = 0;
     function animate() {
-        hc.fill
+        hc.fillStyle = "rgba(0,0,0,0.1)";
+        hc.fillRect(0,0,hackCanvas.width,hackCanvas.height);
+        hc.fillStyle = "#00ff00";
+        hc.font = "20px monospace";
+        particles.forEach(p => {
+            hc.fillText(p.char, p.x, p.y);
+            p.y += p.speedY;
+            if (p.y > hackCanvas.height) p.y = 0;
+        });
+        count++;
+        if (count < 60) requestAnimationFrame(animate);
+        else hackCanvas.remove();
+    }
+    animate();
+}
+
+/* ==============================
+      Фоновая музыка (играет после клика)
+============================== */
+const music = document.getElementById("backgroundMusic");
+document.body.addEventListener("click", () => {
+    if (music.paused) music.play();
+});
+</script>
+</body>
+</html>
