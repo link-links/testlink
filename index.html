@@ -3,31 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Заголовок страницы -->
 <title>min_4x</title>
 
 <style>
-/* ==============================
-      Основной стиль страницы
-============================== */
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: monospace; /* Моноширинный шрифт для эффекта терминала */
-    background: black;       /* Черный фон */
-    color: #00ff00;          /* Зеленый текст */
-    overflow: hidden;        /* Скрываем скролл */
-    
+    font-family: monospace;
+    background: black;
+    color: #00ff00;
+    overflow: hidden;
     display: flex;
     justify-content: center;
-    align-items: center;     /* Центрируем контейнер */
+    align-items: center;
 }
 
-/* ==============================
-      Фейковая загрузка
-============================== */
+/* Loader с процентами */
 #loader {
     position: fixed;
     width: 100%;
@@ -38,43 +30,24 @@ body, html {
     align-items: center;
     flex-direction: column;
     z-index: 10;
-}
-
-/* Мигающий курсор */
-#loader span {
     font-size: 24px;
-    margin-top: 20px;
-    animation: blink 1s infinite;
 }
 
-@keyframes blink {
-    0%, 50%, 100% { opacity: 1; }
-    25%, 75% { opacity: 0; }
-}
-
-/* ==============================
-      Контейнер с рамкой и кнопками
-============================== */
+/* Контейнер с рамкой */
 .container {
     text-align: center;
     position: relative;
     z-index: 1;
-    display: none; /* Скрыт до конца загрузки */
+    display: none;
     padding: 30px;
-    border: 2px solid #00ff00; /* Зеленая рамка */
-    box-shadow: 0 0 20px #00ff00; /* Светящаяся рамка */
-    background: rgba(0,0,0,0.8); /* Полупрозрачный фон внутри рамки */
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 20px #00ff00;
+    background: rgba(0,0,0,0.8);
     border-radius: 10px;
 }
 
-/* Заголовок */
-h1 {
-    font-size: 36px;
-    margin-bottom: 25px;
-    letter-spacing: 2px;
-}
+h1 { font-size: 36px; margin-bottom: 25px; letter-spacing: 2px; }
 
-/* Кнопки на соцсети */
 .btn {
     display: block;
     margin: 10px auto;
@@ -87,82 +60,61 @@ h1 {
     cursor: pointer;
 }
 
-.btn:hover {
-    background: #00ff00;
-    color: black;
-    box-shadow: 0 0 15px #00ff00;
-}
+.btn:hover { background: #00ff00; color: black; box-shadow: 0 0 15px #00ff00; }
 
-/* ==============================
-      Matrix canvas
-============================== */
-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 0;
-}
+canvas { position: fixed; top: 0; left: 0; z-index: 0; }
 </style>
 </head>
 <body>
 
-<!-- ==============================
-      Фейковая загрузка
-============================== -->
-<div id="loader">
-    <div>Загрузка системы...</div> <!-- Текст загрузки -->
-    <span>█ █ █ █ █</span>        <!-- Мигающий курсор -->
-</div>
+<!-- Loader -->
+<div id="loader">Загрузка системы: 0%</div>
 
-<!-- ==============================
-      Фон с падающими символами
-============================== -->
+<!-- Matrix фон -->
 <canvas id="matrix"></canvas>
 
-<!-- ==============================
-      Контейнер с рамкой и кнопками
-============================== -->
+<!-- Контейнер для кнопок -->
 <div class="container">
     <h1>min_4x</h1>
-
-    <!-- Кнопки на соцсети -->
-    <a href="https://t.me/ТВОЙ_ТГ" class="btn">Telegram</a>
-    <a href="https://youtube.com/" class="btn">YouTube</a>
-    <a href="https://discord.com/" class="btn">Discord</a>
-    <a href="https://twitch.tv/" class="btn">Twitch</a>
-    <a href="#" class="btn">Instagram</a>
-    <a href="#" class="btn">TikTok</a>
+    <div id="buttonsContainer"></div>
 </div>
 
-<!-- Музыка на клик -->
-<audio id="clickSound" src="music.mp3"></audio> <!-- Тут можно вставить свой трек -->
+<!-- Фоновая музыка (играет постоянно) -->
+<audio id="backgroundMusic" src="background.mp3" loop autoplay></audio>
 
 <script>
 /* ==============================
-      Фейковая загрузка через JS
+      Загрузка с процентами
 ============================== */
-setTimeout(() => {
-    document.getElementById('loader').style.display = 'none'; // Убираем экран загрузки
-    document.querySelector('.container').style.display = 'block'; // Показываем контейнер с кнопками
-}, 3000); // Задержка 3 секунды
+let percent = 0;
+const loaderText = document.getElementById('loader');
+const interval = setInterval(() => {
+    percent++;
+    loaderText.textContent = `Загрузка системы: ${percent}%`;
+    if (percent >= 100) {
+        clearInterval(interval);
+        loaderText.style.display = 'none';
+        document.querySelector('.container').style.display = 'block';
+    }
+}, 50);
 
 /* ==============================
-      Matrix эффект (падающие символы)
+      Matrix эффект
 ============================== */
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Символы для эффекта
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const fontSize = 14;
 const columns = canvas.width / fontSize;
 const drops = Array.from({length: columns}, () => 1);
 
 function drawMatrix() {
-    ctx.fillStyle = "rgba(0,0,0,0.05)"; // Создаем полупрозрачный фон для размытия предыдущих символов
+    ctx.fillStyle = "rgba(0,0,0,0.05)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#00ff00"; // Цвет символов
+    ctx.fillStyle = "#00ff00";
     ctx.font = fontSize + "px monospace";
     for (let i = 0; i < drops.length; i++) {
         const text = letters.charAt(Math.floor(Math.random() * letters.length));
@@ -174,19 +126,34 @@ function drawMatrix() {
 setInterval(drawMatrix, 33);
 
 /* ==============================
-      Музыка на клик + взлом-анимация
+      Динамическое добавление кнопок
 ============================== */
-const clickSound = document.getElementById('clickSound');
-document.querySelectorAll('.btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        clickSound.currentTime = 0; // Сбросить звук
-        clickSound.play();           // Проиграть звук
-        triggerHackAnimation();      // Запустить взлом-анимацию
+const buttons = [
+    {text: "Telegram", link: "https://t.me/ТВОЙ_ТГ"},
+    {text: "YouTube", link: "https://youtube.com/"},
+    {text: "Discord", link: "https://discord.com/"},
+    {text: "Twitch", link: "https://twitch.tv/"},
+    {text: "Instagram", link: "#"},
+    {text: "TikTok", link: "#"}
+];
+
+const buttonsContainer = document.getElementById('buttonsContainer');
+
+buttons.forEach(b => {
+    const a = document.createElement('a');
+    a.href = b.link;
+    a.textContent = b.text;
+    a.className = 'btn';
+    buttonsContainer.appendChild(a);
+
+    // Клик по кнопке запускает только взлом-анимацию, фон продолжает играть
+    a.addEventListener('click', () => {
+        triggerHackAnimation();
     });
 });
 
 /* ==============================
-      Взлом-анимация (летящие символы)
+      Взлом-анимация
 ============================== */
 function triggerHackAnimation() {
     const hackCanvas = document.createElement('canvas');
@@ -195,14 +162,14 @@ function triggerHackAnimation() {
     hackCanvas.style.left = '0';
     hackCanvas.style.width = '100%';
     hackCanvas.style.height = '100%';
-    hackCanvas.style.zIndex = 5; // Над контейнером
+    hackCanvas.style.zIndex = 5;
     document.body.appendChild(hackCanvas);
 
     const hc = hackCanvas.getContext('2d');
     hackCanvas.width = window.innerWidth;
     hackCanvas.height = window.innerHeight;
 
-    const chars = "01<>#%&@"; // Символы для анимации
+    const chars = "01<>#%&@";
     let particles = Array.from({length: 100}, () => ({
         x: Math.random() * hackCanvas.width,
         y: Math.random() * hackCanvas.height,
@@ -212,9 +179,9 @@ function triggerHackAnimation() {
 
     let count = 0;
     function animate() {
-        hc.fillStyle = "rgba(0,0,0,0.1)"; // Полупрозрачный фон для размытия
+        hc.fillStyle = "rgba(0,0,0,0.1)";
         hc.fillRect(0,0,hackCanvas.width,hackCanvas.height);
-        hc.fillStyle = "#00ff00"; // Цвет символов
+        hc.fillStyle = "#00ff00";
         hc.font = "20px monospace";
         particles.forEach(p => {
             hc.fillText(p.char, p.x, p.y);
@@ -222,23 +189,22 @@ function triggerHackAnimation() {
             if (p.y > hackCanvas.height) p.y = 0;
         });
         count++;
-        if (count < 60) requestAnimationFrame(animate); // 60 кадров
-        else hackCanvas.remove(); // Убираем анимацию после ~2 секунд
+        if (count < 60) requestAnimationFrame(animate);
+        else hackCanvas.remove();
     }
     animate();
 }
 
 /* ==============================
-      Что мы тут наделали
+      Что тут наделано
 ==============================
-1. Сделали черный фон и зеленый текст в стиле хакера.
-2. Добавили фейковую загрузку с мигающим курсором (3 сек).
-3. Сделали центральный контейнер с рамкой и полупрозрачным фоном.
-4. Добавили кнопки на соцсети (Telegram, YouTube, Discord, Twitch, Instagram, TikTok).
-5. Сделали падающие символы “матрица” на заднем фоне.
-6. Добавили звук при клике на кнопку.
-7. Создали анимацию взлома с летящими символами поверх страницы.
-8. Всё это собрано так, чтобы выглядело как терминал хакера с эффектом Matrix.
+1. Черный фон, зеленый текст, Matrix на заднем плане.
+2. Фейковая загрузка с процентами 0-100%.
+3. Контейнер с рамкой и кнопками.
+4. Кнопки создаются через массив JS — любое количество.
+5. Клик по кнопке запускает взлом-анимацию, фон продолжает играть.
+6. Фоновая музыка background.mp3 играет автоматически и бесконечно (loop).
+7. Ты можешь заменить background.mp3 на свою музыку в папке рядом с index.html.
 */
 </script>
 </body>
