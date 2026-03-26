@@ -19,7 +19,7 @@ body, html {
     align-items: center;
 }
 
-/* Loader с процентами */
+/* Loader */
 #loader {
     position: fixed;
     width: 100%;
@@ -33,21 +33,31 @@ body, html {
     font-size: 24px;
 }
 
-/* Контейнер с рамкой */
-.container {
-    text-align: center;
-    position: relative;
-    z-index: 1;
-    display: none;
-    padding: 30px;
+/* Контейнер терминала */
+#terminalContainer {
+    position: absolute;
+    text-align: left;
+    padding: 20px;
     border: 2px solid #00ff00;
     box-shadow: 0 0 20px #00ff00;
     background: rgba(0,0,0,0.8);
     border-radius: 10px;
+    display: none;
 }
 
-h1 { font-size: 36px; margin-bottom: 25px; letter-spacing: 2px; }
+/* Контейнер для кнопок */
+#buttonsContainer {
+    text-align: center;
+    display: none;
+}
 
+h1 {
+    font-size: 36px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+/* Кнопки */
 .btn {
     display: block;
     margin: 10px auto;
@@ -57,50 +67,59 @@ h1 { font-size: 36px; margin-bottom: 25px; letter-spacing: 2px; }
     color: #00ff00;
     text-decoration: none;
     transition: 0.3s;
-    cursor: pointer;
 }
 
-.btn:hover { background: #00ff00; color: black; box-shadow: 0 0 15px #00ff00; }
+.btn:hover {
+    background: #00ff00;
+    color: black;
+    box-shadow: 0 0 15px #00ff00;
+}
 
-canvas { position: fixed; top: 0; left: 0; z-index: 0; }
+/* Canvas Matrix */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
 </style>
 </head>
 <body>
 
-<!-- Loader -->
+<!-- Загрузка -->
 <div id="loader">Загрузка системы: 0%</div>
+
+<!-- Терминал -->
+<div id="terminalContainer">
+    <pre id="terminal"></pre>
+</div>
+
+<!-- Название и кнопки -->
+<div id="buttonsContainer">
+    <h1>MIN_4IK</h1>
+</div>
 
 <!-- Matrix фон -->
 <canvas id="matrix"></canvas>
-
-<!-- Контейнер для кнопок -->
-<div class="container">
-    <h1>MIN_4IK</h1>
-    <div id="buttonsContainer"></div>
-</div>
 
 <!-- Фоновая музыка -->
 <audio id="backgroundMusic" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
 
 <script>
-/* ==============================
-      Загрузка с процентами
-============================== */
+// ===================== Фейковая загрузка =====================
 let percent = 0;
 const loaderText = document.getElementById('loader');
-const interval = setInterval(() => {
+const loaderInterval = setInterval(() => {
     percent++;
     loaderText.textContent = `Загрузка системы: ${percent}%`;
     if (percent >= 100) {
-        clearInterval(interval);
+        clearInterval(loaderInterval);
         loaderText.style.display = 'none';
-        document.querySelector('.container').style.display = 'block';
+        showTerminal();
     }
-}, 50);
+}, 40); // скорость загрузки
 
-/* ==============================
-      Matrix эффект
-============================== */
+// ===================== Matrix эффект =====================
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -126,36 +145,68 @@ function drawMatrix() {
 }
 drawMatrix();
 
-/* ==============================
-      Динамические кнопки (любое количество)
-============================== */
-const buttons = [
-    {text: "Telegram", link: "https://t.me/ТВОЙ_ТГ"},
-    {text: "YouTube", link: "https://youtube.com/"},
-    {text: "Discord", link: "https://discord.com/"},
-    {text: "Twitch", link: "https://twitch.tv/"},
-    {text: "Instagram", link: "#"},
-    {text: "TikTok", link: "#"}
+// ===================== Терминал =====================
+const terminalContainer = document.getElementById('terminalContainer');
+const terminal = document.getElementById('terminal');
+const terminalLines = [
+    "[SYSTEM INITIALIZING...]",
+    "[CHECKING NETWORK CONNECTION...]",
+    "[FIREWALL STATUS: OK]",
+    "[LOADING SECURITY MODULES...]",
+    "[ACCESS GRANTED TO MIN_4IK NETWORK]",
+    "[WELCOME, OPERATOR]"
 ];
 
-const buttonsContainer = document.getElementById('buttonsContainer');
+function showTerminal() {
+    terminalContainer.style.display = 'block';
+    typeTerminalLine(0);
+}
 
-buttons.forEach(b => {
-    const a = document.createElement('a');
-    a.href = b.link;
-    a.textContent = b.text;
-    a.className = 'btn';
-    buttonsContainer.appendChild(a);
+function typeTerminalLine(index) {
+    if (index >= terminalLines.length) {
+        setTimeout(() => {
+            terminalContainer.style.display = 'none';
+            showButtons();
+        }, 500); // пауза перед кнопками
+        return;
+    }
+    let line = terminalLines[index];
+    let charIndex = 0;
+    const interval = setInterval(() => {
+        terminal.textContent += line[charIndex];
+        charIndex++;
+        if (charIndex >= line.length) {
+            clearInterval(interval);
+            terminal.textContent += "\n";
+            typeTerminalLine(index + 1);
+        }
+    }, 50);
+}
 
-    // Клик запускает только взлом-анимацию
-    a.addEventListener('click', () => {
-        triggerHackAnimation();
+// ===================== Показ кнопок =====================
+function showButtons() {
+    const buttonsContainer = document.getElementById('buttonsContainer');
+    buttonsContainer.style.display = 'block';
+    const buttons = [
+        {text: "Telegram", link: "https://t.me/ТВОЙ_ТГ"},
+        {text: "YouTube", link: "https://youtube.com/"},
+        {text: "Discord", link: "https://discord.com/"},
+        {text: "Twitch", link: "https://twitch.tv/"},
+        {text: "Instagram", link: "#"},
+        {text: "TikTok", link: "#"}
+    ];
+
+    buttons.forEach(b => {
+        const a = document.createElement('a');
+        a.href = b.link;
+        a.textContent = b.text;
+        a.className = 'btn';
+        buttonsContainer.appendChild(a);
+        a.addEventListener('click', () => triggerHackAnimation());
     });
-});
+}
 
-/* ==============================
-      Взлом-анимация
-============================== */
+// ===================== Взлом-анимация =====================
 function triggerHackAnimation() {
     const hackCanvas = document.createElement('canvas');
     hackCanvas.style.position = 'fixed';
@@ -196,9 +247,7 @@ function triggerHackAnimation() {
     animate();
 }
 
-/* ==============================
-      Фоновая музыка (играет после клика)
-============================== */
+// ===================== Фоновая музыка =====================
 const music = document.getElementById("backgroundMusic");
 document.body.addEventListener("click", () => {
     if (music.paused) music.play();
