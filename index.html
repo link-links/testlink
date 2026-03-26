@@ -3,254 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIN_4IK - HACK SYSTEM</title>
+<title>AgaP0rn</title>
 
 <style>
 body {
-    margin:0;
-    background:black;
-    color:#00ff00;
-    font-family:monospace;
+    margin: 0;
+    background: black;
+    color: #00ff00;
+    font-family: monospace;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
+/* Фон "матрица" */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+/* Контейнер */
 .container {
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    text-align:center;
+    text-align: center;
 }
 
-#terminal {
-    white-space:pre-wrap;
-    padding:20px;
+/* Заголовок */
+h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
 }
 
-#cameraBox {
-    display:none;
-    margin-top:20px;
-    border:2px solid #00ff00;
-    width:300px;
-    height:200px;
-    position:relative;
+/* Кнопки */
+.btn {
+    display: block;
+    margin: 10px auto;
+    padding: 12px 20px;
+    width: 200px;
+    border: 1px solid #00ff00;
+    color: #00ff00;
+    text-decoration: none;
+    transition: 0.3s;
 }
 
-#cameraBox video {
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    filter:contrast(2) brightness(0.6) grayscale(1);
-}
-
-#rec {
-    position:absolute;
-    top:5px;
-    left:5px;
-    color:red;
-    animation: blink 1s infinite;
-}
-
-#seeYou {
-    position:absolute;
-    bottom:5px;
-    left:5px;
-    color:red;
-}
-
-@keyframes blink {
-    0%,50%,100%{opacity:1;}
-    25%,75%{opacity:0;}
-}
-
-#alertMsg {
-    display:none;
-    position:fixed;
-    top:10px;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:28px;
-    color:red;
-    animation: blink 0.7s infinite;
-}
-
-#timer {
-    color:red;
-    margin-top:10px;
+.btn:hover {
+    background: #00ff00;
+    color: black;
+    box-shadow: 0 0 15px #00ff00;
 }
 </style>
 </head>
 
 <body>
 
+<canvas id="matrix"></canvas>
+
 <div class="container">
-<div id="terminal"></div>
+    <h1>AgaP0rn</h1>
 
-<div id="cameraBox">
-<div id="rec">● REC</div>
-<div id="seeYou">WE SEE YOU</div>
-<video autoplay muted loop>
-<source src="https://cdn.pixabay.com/video/2022/03/15/110662-687543015_tiny.mp4">
-</video>
+    <a href="https://t.me/ТВОЙ_ТГ" class="btn">Telegram</a>
+    <a href="https://youtube.com/" class="btn">YouTube</a>
+    <a href="https://discord.com/" class="btn">Discord</a>
+    <a href="https://twitch.tv/" class="btn">Twitch</a>
+    <a href="#" class="btn">Instagram</a>
+    <a href="#" class="btn">TikTok</a>
 </div>
-
-<div id="alertMsg">DON'T CLOSE THIS PAGE</div>
-<div id="timer"></div>
-</div>
-
-<audio id="typing" loop muted>
-<source src="https://pixabay.com/static/uploads/sound-effects/keyboard-typing-sound-247417.mp3">
-</audio>
-
-<audio id="alarm">
-<source src="https://pixabay.com/static/uploads/sound-effects/alarm-10946.mp3">
-</audio>
-
-<audio id="beep">
-<source src="https://www.soundjay.com/button/beep-07.mp3">
-</audio>
 
 <script>
-// ===== SOUND =====
-const typing=document.getElementById("typing");
-const alarm=document.getElementById("alarm");
-const beep=document.getElementById("beep");
+// Matrix эффект
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
 
-let started=false;
-document.body.onclick=()=>{
-if(!started){
-started=true;
-typing.muted=false;
-typing.play();
-}
-}
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-// ===== ДАННЫЕ =====
-function rand(a,b){return Math.floor(Math.random()*(b-a)+a);}
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
 
-function ip(){
-return `${rand(10,255)}.${rand(0,255)}.${rand(0,255)}.${rand(0,255)}`;
-}
+const drops = [];
 
-function device(){
-const arr=["Samsung","Vivo","iPhone","Huawei","Xiaomi"];
-return arr[rand(0,arr.length)];
-}
+for (let x = 0; x < columns; x++)
+    drops[x] = 1;
 
-function user(){
-let name = navigator.userAgent;
-return name.includes("Android") ? "android_user" :
-       name.includes("iPhone") ? "iphone_user" :
-       "guest_"+rand(1000,9999);
-}
+function draw() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-function locationFake(){
-let lang = navigator.language;
-if(lang.includes("ru")) return "Russia";
-if(lang.includes("en")) return "USA";
-if(lang.includes("de")) return "Germany";
-return "Unknown";
+    ctx.fillStyle = "#00ff00";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975)
+            drops[i] = 0;
+
+        drops[i]++;
+    }
 }
 
-// ===== TERMINAL =====
-const term=document.getElementById("terminal");
-
-function type(text,cb){
-let i=0;
-let int=setInterval(()=>{
-term.innerHTML+=text[i];
-i++;
-if(i>=text.length){
-clearInterval(int);
-term.innerHTML+="\n";
-cb&&cb();
-}
-},30);
-}
-
-// ===== СТАРТ =====
-type("[SYSTEM START]",()=>{
-type("[CONNECTING...]",()=>{
-setTimeout(start,500);
-});
-});
-
-function start(){
-alarm.play();
-
-type("[TARGET FOUND]",()=>{
-type("[USERNAME: "+user()+"]",()=>{
-type("[DEVICE: "+device()+"]",()=>{
-type("[LOCATION: "+locationFake()+"]",()=>{
-type("[IP: "+ip()+"]",()=>{
-type("[ACCESS CAMERA...]",()=>{
-document.getElementById("cameraBox").style.display="block";
-type("[CAMERA ONLINE]",()=>{
-hack();
-});
-});
-});
-});
-});
-});
-}
-
-// ===== ВЗЛОМ =====
-function hack(){
-let p=0;
-let int=setInterval(()=>{
-p+=5;
-term.innerHTML+=`[HACKING ${p}%]\n`;
-if(p>=100){
-clearInterval(int);
-files();
-}
-},100);
-}
-
-// ===== ФАЙЛЫ =====
-function files(){
-type("[SCANNING FILES...]",()=>{
-type("[FOUND: photos.zip]",()=>{
-type("[FOUND: passwords.txt]",()=>{
-type("[FOUND: chats.log]",()=>{
-download();
-});
-});
-});
-});
-}
-
-function download(){
-let p=0;
-let int=setInterval(()=>{
-p+=10;
-term.innerHTML+=`[DOWNLOADING DATA ${p}%]\n`;
-if(p>=100){
-clearInterval(int);
-finish();
-}
-},120);
-}
-
-// ===== ФИНАЛ =====
-function finish(){
-document.getElementById("alertMsg").style.display="block";
-
-let t=10;
-let timer=document.getElementById("timer");
-
-let int=setInterval(()=>{
-timer.innerHTML="TIME LEFT: "+t;
-t--;
-if(t<0) clearInterval(int);
-},1000);
-
-type("[ACCESS GRANTED]",()=>{
-type("[ALL DATA STORED]",()=>{
-beep.play();
-});
-});
-}
+setInterval(draw, 33);
 </script>
 
 </body>
