@@ -30,8 +30,8 @@ body, html {
     font-size: 24px;
 }
 
-/* Терминал */
-#terminalContainer {
+/* Терминал и контейнер с названием+кнопками */
+.container-terminal {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -46,20 +46,9 @@ body, html {
     z-index: 10;
 }
 
-/* Основной контейнер для названия и кнопок */
-#mainContainer {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
+/* Заголовок в контейнере */
+.container-terminal h1 {
     text-align: center;
-    z-index: 10;
-}
-
-h1 {
-    font-size: 36px;
-    letter-spacing: 2px;
     margin-bottom: 20px;
 }
 
@@ -91,12 +80,12 @@ canvas { position: fixed; top: 0; left: 0; z-index: 0; }
 <div id="loader">Загрузка системы: 0%</div>
 
 <!-- Терминал -->
-<div id="terminalContainer">
+<div id="terminalContainer" class="container-terminal">
     <pre id="terminal"></pre>
 </div>
 
-<!-- Название и кнопки -->
-<div id="mainContainer">
+<!-- Название + кнопки -->
+<div id="mainContainer" class="container-terminal">
     <h1>MIN_4IK</h1>
     <div id="buttonsContainer"></div>
 </div>
