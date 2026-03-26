@@ -3,19 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>min_4ik</title>
+
+<!-- Заголовок страницы -->
+<title>min_4x</title>
+
 <style>
+/* ==============================
+      Основной стиль страницы
+============================== */
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: monospace;
-    background: black;
-    color: #00ff00;
-    overflow: hidden;
+    font-family: monospace; /* Моноширинный шрифт для эффекта терминала */
+    background: black;       /* Черный фон */
+    color: #00ff00;          /* Зеленый текст */
+    overflow: hidden;        /* Скрываем скролл */
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;     /* Центрируем контейнер */
 }
 
-/* Фейковая загрузка */
+/* ==============================
+      Фейковая загрузка
+============================== */
 #loader {
     position: fixed;
     width: 100%;
@@ -28,6 +40,7 @@ body, html {
     z-index: 10;
 }
 
+/* Мигающий курсор */
 #loader span {
     font-size: 24px;
     margin-top: 20px;
@@ -39,24 +52,34 @@ body, html {
     25%, 75% { opacity: 0; }
 }
 
-/* Контейнер с кнопками */
+/* ==============================
+      Контейнер с рамкой и кнопками
+============================== */
 .container {
     text-align: center;
     position: relative;
     z-index: 1;
-    display: none;
+    display: none; /* Скрыт до конца загрузки */
+    padding: 30px;
+    border: 2px solid #00ff00; /* Зеленая рамка */
+    box-shadow: 0 0 20px #00ff00; /* Светящаяся рамка */
+    background: rgba(0,0,0,0.8); /* Полупрозрачный фон внутри рамки */
+    border-radius: 10px;
 }
 
+/* Заголовок */
 h1 {
-    font-size: 32px;
-    margin-bottom: 20px;
+    font-size: 36px;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
 }
 
+/* Кнопки на соцсети */
 .btn {
     display: block;
     margin: 10px auto;
     padding: 12px 20px;
-    width: 200px;
+    width: 220px;
     border: 1px solid #00ff00;
     color: #00ff00;
     text-decoration: none;
@@ -70,7 +93,9 @@ h1 {
     box-shadow: 0 0 15px #00ff00;
 }
 
-/* Matrix canvas */
+/* ==============================
+      Matrix canvas
+============================== */
 canvas {
     position: fixed;
     top: 0;
@@ -81,15 +106,26 @@ canvas {
 </head>
 <body>
 
+<!-- ==============================
+      Фейковая загрузка
+============================== -->
 <div id="loader">
-    <div>Загрузка системы...</div>
-    <span>█ █ █ █ █</span>
+    <div>Загрузка системы...</div> <!-- Текст загрузки -->
+    <span>█ █ █ █ █</span>        <!-- Мигающий курсор -->
 </div>
 
+<!-- ==============================
+      Фон с падающими символами
+============================== -->
 <canvas id="matrix"></canvas>
 
+<!-- ==============================
+      Контейнер с рамкой и кнопками
+============================== -->
 <div class="container">
-    <h1>min_4ik</h1>
+    <h1>min_4x</h1>
+
+    <!-- Кнопки на соцсети -->
     <a href="https://t.me/ТВОЙ_ТГ" class="btn">Telegram</a>
     <a href="https://youtube.com/" class="btn">YouTube</a>
     <a href="https://discord.com/" class="btn">Discord</a>
@@ -98,30 +134,35 @@ canvas {
     <a href="#" class="btn">TikTok</a>
 </div>
 
-<audio id="clickSound" src="music.mp3"></audio>
+<!-- Музыка на клик -->
+<audio id="clickSound" src="music.mp3"></audio> <!-- Тут можно вставить свой трек -->
 
 <script>
-// --------------------- Фейковая загрузка ---------------------
+/* ==============================
+      Фейковая загрузка через JS
+============================== */
 setTimeout(() => {
-    document.getElementById('loader').style.display = 'none';
-    document.querySelector('.container').style.display = 'block';
-}, 3000); // 3 секунды
+    document.getElementById('loader').style.display = 'none'; // Убираем экран загрузки
+    document.querySelector('.container').style.display = 'block'; // Показываем контейнер с кнопками
+}, 3000); // Задержка 3 секунды
 
-// --------------------- Matrix эффект ---------------------
+/* ==============================
+      Matrix эффект (падающие символы)
+============================== */
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Символы для эффекта
 const fontSize = 14;
 const columns = canvas.width / fontSize;
 const drops = Array.from({length: columns}, () => 1);
 
 function drawMatrix() {
-    ctx.fillStyle = "rgba(0,0,0,0.05)";
+    ctx.fillStyle = "rgba(0,0,0,0.05)"; // Создаем полупрозрачный фон для размытия предыдущих символов
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#00ff00";
+    ctx.fillStyle = "#00ff00"; // Цвет символов
     ctx.font = fontSize + "px monospace";
     for (let i = 0; i < drops.length; i++) {
         const text = letters.charAt(Math.floor(Math.random() * letters.length));
@@ -132,17 +173,21 @@ function drawMatrix() {
 }
 setInterval(drawMatrix, 33);
 
-// --------------------- Музыка на клик ---------------------
+/* ==============================
+      Музыка на клик + взлом-анимация
+============================== */
 const clickSound = document.getElementById('clickSound');
 document.querySelectorAll('.btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        clickSound.currentTime = 0;
-        clickSound.play();
-        triggerHackAnimation();
+        clickSound.currentTime = 0; // Сбросить звук
+        clickSound.play();           // Проиграть звук
+        triggerHackAnimation();      // Запустить взлом-анимацию
     });
 });
 
-// --------------------- Взлом-анимация ---------------------
+/* ==============================
+      Взлом-анимация (летящие символы)
+============================== */
 function triggerHackAnimation() {
     const hackCanvas = document.createElement('canvas');
     hackCanvas.style.position = 'fixed';
@@ -150,14 +195,14 @@ function triggerHackAnimation() {
     hackCanvas.style.left = '0';
     hackCanvas.style.width = '100%';
     hackCanvas.style.height = '100%';
-    hackCanvas.style.zIndex = 5;
+    hackCanvas.style.zIndex = 5; // Над контейнером
     document.body.appendChild(hackCanvas);
 
     const hc = hackCanvas.getContext('2d');
     hackCanvas.width = window.innerWidth;
     hackCanvas.height = window.innerHeight;
 
-    const chars = "01<>#%&@";
+    const chars = "01<>#%&@"; // Символы для анимации
     let particles = Array.from({length: 100}, () => ({
         x: Math.random() * hackCanvas.width,
         y: Math.random() * hackCanvas.height,
@@ -167,9 +212,9 @@ function triggerHackAnimation() {
 
     let count = 0;
     function animate() {
-        hc.fillStyle = "rgba(0,0,0,0.1)";
+        hc.fillStyle = "rgba(0,0,0,0.1)"; // Полупрозрачный фон для размытия
         hc.fillRect(0,0,hackCanvas.width,hackCanvas.height);
-        hc.fillStyle = "#00ff00";
+        hc.fillStyle = "#00ff00"; // Цвет символов
         hc.font = "20px monospace";
         particles.forEach(p => {
             hc.fillText(p.char, p.x, p.y);
@@ -177,12 +222,24 @@ function triggerHackAnimation() {
             if (p.y > hackCanvas.height) p.y = 0;
         });
         count++;
-        if (count < 60) requestAnimationFrame(animate); // 60 кадров ~ 2 секунды
-        else hackCanvas.remove();
+        if (count < 60) requestAnimationFrame(animate); // 60 кадров
+        else hackCanvas.remove(); // Убираем анимацию после ~2 секунд
     }
     animate();
 }
-</script>
 
+/* ==============================
+      Что мы тут наделали
+==============================
+1. Сделали черный фон и зеленый текст в стиле хакера.
+2. Добавили фейковую загрузку с мигающим курсором (3 сек).
+3. Сделали центральный контейнер с рамкой и полупрозрачным фоном.
+4. Добавили кнопки на соцсети (Telegram, YouTube, Discord, Twitch, Instagram, TikTok).
+5. Сделали падающие символы “матрица” на заднем фоне.
+6. Добавили звук при клике на кнопку.
+7. Создали анимацию взлома с летящими символами поверх страницы.
+8. Всё это собрано так, чтобы выглядело как терминал хакера с эффектом Matrix.
+*/
+</script>
 </body>
 </html>
