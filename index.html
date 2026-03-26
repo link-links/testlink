@@ -14,9 +14,6 @@ body, html {
     background: black;
     color: #00ff00;
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 /* Loader */
@@ -33,9 +30,12 @@ body, html {
     font-size: 24px;
 }
 
-/* Контейнер терминала */
+/* Терминал */
 #terminalContainer {
-    position: absolute;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: left;
     padding: 20px;
     border: 2px solid #00ff00;
@@ -43,12 +43,18 @@ body, html {
     background: rgba(0,0,0,0.8);
     border-radius: 10px;
     display: none;
+    z-index: 10;
 }
 
-/* Контейнер для кнопок */
+/* Контейнер кнопок */
 #buttonsContainer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
     display: none;
+    z-index: 10;
 }
 
 h1 {
@@ -75,18 +81,13 @@ h1 {
     box-shadow: 0 0 15px #00ff00;
 }
 
-/* Canvas Matrix */
-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 0;
-}
+/* Matrix */
+canvas { position: fixed; top: 0; left: 0; z-index: 0; }
 </style>
 </head>
 <body>
 
-<!-- Загрузка -->
+<!-- Loader -->
 <div id="loader">Загрузка системы: 0%</div>
 
 <!-- Терминал -->
@@ -117,9 +118,9 @@ const loaderInterval = setInterval(() => {
         loaderText.style.display = 'none';
         showTerminal();
     }
-}, 40); // скорость загрузки
+}, 40);
 
-// ===================== Matrix эффект =====================
+// ===================== Matrix =====================
 const canvas = document.getElementById("matrix");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
@@ -167,7 +168,7 @@ function typeTerminalLine(index) {
         setTimeout(() => {
             terminalContainer.style.display = 'none';
             showButtons();
-        }, 500); // пауза перед кнопками
+        }, 500);
         return;
     }
     let line = terminalLines[index];
