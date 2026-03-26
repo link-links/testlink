@@ -46,14 +46,14 @@ body, html {
     z-index: 10;
 }
 
-/* Контейнер кнопок */
-#buttonsContainer {
+/* Основной контейнер для названия и кнопок */
+#mainContainer {
+    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%,-50%);
     text-align: center;
-    display: none;
     z-index: 10;
 }
 
@@ -81,7 +81,7 @@ h1 {
     box-shadow: 0 0 15px #00ff00;
 }
 
-/* Matrix */
+/* Matrix фон */
 canvas { position: fixed; top: 0; left: 0; z-index: 0; }
 </style>
 </head>
@@ -96,8 +96,9 @@ canvas { position: fixed; top: 0; left: 0; z-index: 0; }
 </div>
 
 <!-- Название и кнопки -->
-<div id="buttonsContainer">
+<div id="mainContainer">
     <h1>MIN_4IK</h1>
+    <div id="buttonsContainer"></div>
 </div>
 
 <!-- Matrix фон -->
@@ -186,8 +187,10 @@ function typeTerminalLine(index) {
 
 // ===================== Показ кнопок =====================
 function showButtons() {
+    const mainContainer = document.getElementById('mainContainer');
     const buttonsContainer = document.getElementById('buttonsContainer');
-    buttonsContainer.style.display = 'block';
+    mainContainer.style.display = 'block';
+
     const buttons = [
         {text: "Telegram", link: "https://t.me/ТВОЙ_ТГ"},
         {text: "YouTube", link: "https://youtube.com/"},
@@ -203,6 +206,7 @@ function showButtons() {
         a.textContent = b.text;
         a.className = 'btn';
         buttonsContainer.appendChild(a);
+
         a.addEventListener('click', () => triggerHackAnimation());
     });
 }
