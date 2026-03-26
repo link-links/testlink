@@ -3,232 +3,294 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIN_4IK - SYSTEM HACK</title>
+<title>MIN_4IK - HACK SYSTEM</title>
 
 <style>
-/* ==========================
-   Стили страницы
-========================== */
 body {
-    margin: 0;
-    background: black; /* фон страницы */
-    color: #00ff00; /* цвет текста */
-    font-family: monospace; /* терминальный шрифт */
-    overflow: hidden;
+    margin:0;
+    background:black;
+    color:#00ff00;
+    font-family:monospace;
+    overflow:hidden;
 }
 
-/* Canvas для падающего Matrix кода */
-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1; /* позади всего контента */
+canvas { position:fixed; top:0; left:0; z-index:-2; }
+
+.noise {
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:url("https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif");
+    opacity:0.05;
+    z-index:-1;
 }
 
-/* Контейнер с терминалом и кнопками */
 .container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
 }
 
-/* Терминал */
 #terminal {
-    padding: 20px;
-    white-space: pre-wrap; /* перенос строк */
-    line-height: 1.4;
+    white-space:pre-wrap;
+    padding:20px;
 }
 
-/* Кнопки */
-.btn {
-    display: inline-block;
-    margin: 8px;
-    padding: 10px 20px;
-    border: 1px solid #00ff00;
-    border-radius: 6px;
-    color: #00ff00;
-    text-decoration: none;
-    transition: 0.3s;
+#cameraBox {
+    display:none;
+    margin-top:20px;
+    border:2px solid #00ff00;
+    width:300px;
+    height:200px;
+    position:relative;
 }
 
-.btn:hover {
-    background: #00ff00;
-    color: black;
-    box-shadow: 0 0 15px #00ff00;
+#cameraBox video {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter:contrast(2) brightness(0.6) grayscale(1);
 }
 
-/* Мигающий курсор */
-.cursor {
-    display: inline-block;
-    width: 10px;
-    background-color: #00ff00;
+#rec {
+    position:absolute;
+    top:5px;
+    left:5px;
+    color:red;
     animation: blink 1s infinite;
 }
 
+#seeYou {
+    position:absolute;
+    bottom:5px;
+    left:5px;
+    color:red;
+}
+
 @keyframes blink {
-    0%,50%,100% { background-color: #00ff00; }
-    25%,75% { background-color: black; }
+    0%,50%,100%{opacity:1;}
+    25%,75%{opacity:0;}
+}
+
+#alertMsg {
+    display:none;
+    position:fixed;
+    top:10px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:28px;
+    color:red;
+    animation: blink 0.7s infinite;
+}
+
+#timer {
+    color:red;
+    margin-top:10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ==========================
-     Canvas для падающего Matrix
-========================== -->
+<div class="noise"></div>
 <canvas id="matrix"></canvas>
 
-<!-- Контейнер терминала и кнопок -->
 <div class="container">
-    <div id="terminal"></div> <!-- Здесь печатается текст -->
-    <div id="buttons" style="margin-top:20px;"></div> <!-- Здесь кнопки -->
+<div id="terminal"></div>
+
+<div id="cameraBox">
+<div id="rec">● REC</div>
+<div id="seeYou">WE SEE YOU</div>
+<video autoplay muted loop>
+<source src="https://cdn.pixabay.com/video/2022/03/15/110662-687543015_tiny.mp4">
+</video>
 </div>
 
-<!-- ==========================
-     Loop хакерской печати
-========================== -->
-<audio id="hackSound" loop preload="auto" muted>
-    <source src="https://pixabay.com/static/uploads/sound-effects/keyboard-typing-sound-247417.mp3" type="audio/mpeg">
+<div id="alertMsg">DON'T CLOSE THIS PAGE</div>
+<div id="timer"></div>
+
+</div>
+
+<audio id="typing" loop muted>
+<source src="https://pixabay.com/static/uploads/sound-effects/keyboard-typing-sound-247417.mp3">
+</audio>
+
+<audio id="alarm">
+<source src="https://pixabay.com/static/uploads/sound-effects/alarm-10946.mp3">
+</audio>
+
+<audio id="beep">
+<source src="https://www.soundjay.com/button/beep-07.mp3">
 </audio>
 
 <script>
-// ============================
-// 1. Matrix падающий код
-// ============================
+// ===== MATRIX =====
+const c=document.getElementById("matrix");
+const ctx=c.getContext("2d");
+c.width=innerWidth; c.height=innerHeight;
+const letters="01ABCDEF";
+const size=14;
+const cols=c.width/size;
+const drops=Array(Math.floor(cols)).fill(1);
 
-// Получаем canvas
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
+function draw(){
+ctx.fillStyle="rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="#0f0";
+ctx.font=size+"px monospace";
 
-// Устанавливаем размер canvas
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+drops.forEach((y,i)=>{
+let t=letters[Math.floor(Math.random()*letters.length)];
+ctx.fillText(t,i*size,y*size);
+drops[i]=y*size>c.height?0:y+1;
+});
+requestAnimationFrame(draw);
+}
+draw();
 
-// Символы для падающего кода
-const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const fontSize = 14;
-const columns = Math.floor(canvas.width / fontSize);
+// ===== SOUND =====
+const typing=document.getElementById("typing");
+const alarm=document.getElementById("alarm");
+const beep=document.getElementById("beep");
 
-// Массив для каждой колонки (drop)
-const drops = Array.from({length: columns}, () => 1);
-
-// Функция рисует падающий Matrix код
-function drawMatrix() {
-    ctx.fillStyle = "rgba(0,0,0,0.05)"; // прозрачный след
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "#00ff00"; // цвет символов
-    ctx.font = fontSize + "px monospace";
-
-    drops.forEach((y,i)=>{
-        const text = letters[Math.floor(Math.random()*letters.length)];
-        ctx.fillText(text, i*fontSize, y*fontSize);
-        drops[i] = y*fontSize > canvas.height && Math.random()>0.975 ? 0 : y+1;
-    });
-
-    requestAnimationFrame(drawMatrix); // рекурсивно
+let started=false;
+document.body.onclick=()=>{
+if(!started){
+started=true;
+typing.muted=false;
+typing.play();
+}
 }
 
-drawMatrix();
+// ===== ДАННЫЕ =====
+function rand(a,b){return Math.floor(Math.random()*(b-a)+a);}
 
-// ============================
-// 2. Loop хакерской печати
-// ============================
+function ip(){
+return `${rand(10,255)}.${rand(0,255)}.${rand(0,255)}.${rand(0,255)}`;
+}
 
-// Получаем audio элемент
-const hackSound = document.getElementById("hackSound");
-let soundEnabled = false;
+function device(){
+const arr=["Samsung","Vivo","iPhone","Huawei","Xiaomi"];
+return arr[rand(0,arr.length)];
+}
 
-// Первый клик пользователя разрешает звук
-document.body.addEventListener("click", ()=>{
-    if(!soundEnabled){
-        soundEnabled = true;
-        hackSound.muted = false;
-        hackSound.play().catch(e=>console.log(e));
-        console.log("Звук печати активирован");
-    }
+function user(){
+let name = navigator.userAgent;
+return name.includes("Android") ? "android_user" :
+       name.includes("iPhone") ? "iphone_user" :
+       "guest_"+rand(1000,9999);
+}
+
+function locationFake(){
+let lang = navigator.language;
+if(lang.includes("ru")) return "Russia";
+if(lang.includes("en")) return "USA";
+if(lang.includes("de")) return "Germany";
+return "Unknown";
+}
+
+// ===== TERMINAL =====
+const term=document.getElementById("terminal");
+
+function type(text,cb){
+let i=0;
+let int=setInterval(()=>{
+term.innerHTML+=text[i];
+i++;
+if(i>=text.length){
+clearInterval(int);
+term.innerHTML+="\n";
+cb&&cb();
+}
+},30);
+}
+
+// ===== СТАРТ =====
+type("[SYSTEM START]",()=>{
+type("[CONNECTING...]",()=>{
+setTimeout(start,500);
+});
 });
 
-// Функция проигрывания короткого звука печати
-function playTypeSound(){
-    if(soundEnabled){
-        const clone = hackSound.cloneNode(); // клонируем, чтобы браузер разрешил
-        clone.play();
-    }
-}
+function start(){
+alarm.play();
 
-// ============================
-// 3. Печатающийся текст с мигающим курсором
-// ============================
-
-// terminal — куда выводим текст
-const terminal = document.getElementById("terminal");
-
-// Здесь можно менять строки текста
-const lines = [
-    "[SYSTEM ONLINE]",
-    "[ACCESSING MIN_4IK NETWORK...]",
-    "[FIREWALL BYPASSED]",
-    "[LOADING USER DATA...]",
-    "[SUCCESS]",
-    "[WELCOME, OPERATOR]"
-];
-
-let i=0; // текущая строка
-function typeLine(line, callback){
-    let j=0; // индекс символа
-    const interval = setInterval(()=>{
-        terminal.innerHTML += line[j];
-        playTypeSound(); // звук печати
-        j++;
-        if(j>=line.length){
-            clearInterval(interval);
-            terminal.innerHTML += "\n"; // переход на новую строку
-            if(callback) callback();
-        }
-    },50); // скорость печати (мс)
-}
-
-function typeLines(){
-    if(i<lines.length){
-        typeLine(lines[i], ()=>{ i++; typeLines(); });
-    } else {
-        // добавляем мигающий курсор после текста
-        terminal.innerHTML += '<span class="cursor"></span>';
-    }
-}
-
-typeLines();
-
-// ============================
-// 4. Кнопки (неограниченное количество)
-// ============================
-
-// Здесь можно добавлять/удалять кнопки
-const buttons = [
-    {name:"Telegram", url:"https://t.me/min_4ik"},
-    {name:"YouTube", url:"https://www.youtube.com/@min4ik"},
-    {name:"Discord", url:"https://discord.com/users/424203787234967564"},
-    {name:"Twitch", url:"https://www.twitch.tv/min_4ik"},
-    {name:"TikTok", url:"https://www.tiktok.com/@min_44ik"},
-    {name:"ВКонтакте", url:"https://vk.com/min_4ik"}
-];
-
-// Контейнер для кнопок
-const container = document.getElementById("buttons");
-
-// Создание кнопок с звуком при клике
-buttons.forEach(btn=>{
-    const a = document.createElement("a");
-    a.className = "btn";
-    a.href = btn.url;
-    a.innerText = btn.name;
-    a.target = "_blank";
-    a.addEventListener("click", playTypeSound); // звук при клике
-    container.appendChild(a);
+type("[TARGET FOUND]",()=>{
+type("[USERNAME: "+user()+"]",()=>{
+type("[DEVICE: "+device()+"]",()=>{
+type("[LOCATION: "+locationFake()+"]",()=>{
+type("[IP: "+ip()+"]",()=>{
+type("[ACCESS CAMERA...]",()=>{
+document.getElementById("cameraBox").style.display="block";
+type("[CAMERA ONLINE]",()=>{
+hack();
 });
+});
+});
+});
+});
+});
+}
+
+// ===== ВЗЛОМ =====
+function hack(){
+let p=0;
+let int=setInterval(()=>{
+p+=5;
+term.innerHTML+=`[HACKING ${p}%]\n`;
+if(p>=100){
+clearInterval(int);
+files();
+}
+},100);
+}
+
+// ===== ФАЙЛЫ =====
+function files(){
+type("[SCANNING FILES...]",()=>{
+type("[FOUND: photos.zip]",()=>{
+type("[FOUND: passwords.txt]",()=>{
+type("[FOUND: chats.log]",()=>{
+download();
+});
+});
+});
+});
+}
+
+function download(){
+let p=0;
+let int=setInterval(()=>{
+p+=10;
+term.innerHTML+=`[DOWNLOADING DATA ${p}%]\n`;
+if(p>=100){
+clearInterval(int);
+finish();
+}
+},120);
+}
+
+// ===== ФИНАЛ =====
+function finish(){
+document.getElementById("alertMsg").style.display="block";
+
+let t=10;
+let timer=document.getElementById("timer");
+
+let int=setInterval(()=>{
+timer.innerHTML="TIME LEFT: "+t;
+t--;
+if(t<0) clearInterval(int);
+},1000);
+
+type("[ACCESS GRANTED]",()=>{
+type("[ALL DATA STORED]",()=>{
+beep.play();
+});
+});
+}
 </script>
 
 </body>
