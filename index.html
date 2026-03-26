@@ -13,15 +13,6 @@ body {
     font-family:monospace;
 }
 
-canvas {
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:-1;
-}
-
 .container {
     position:absolute;
     top:50%;
@@ -91,8 +82,6 @@ canvas {
 
 <body>
 
-<canvas id="matrix"></canvas>
-
 <div class="container">
 <div id="terminal"></div>
 
@@ -121,22 +110,148 @@ canvas {
 </audio>
 
 <script>
-// ===== MATRIX FIX =====
-const canvas = document.getElementById("matrix");
-const ctx = canvas.getContext("2d");
+// ===== SOUND =====
+const typing=document.getElementById("typing");
+const alarm=document.getElementById("alarm");
+const beep=document.getElementById("beep");
 
-function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+let started=false;
+document.body.onclick=()=>{
+if(!started){
+started=true;
+typing.muted=false;
+typing.play();
 }
-resize();
-window.addEventListener("resize", resize);
+}
 
-const letters = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const fontSize = 14;
-let columns = Math.floor(window.innerWidth / fontSize);
-let drops = Array(columns).fill(1);
+// ===== ДАННЫЕ =====
+function rand(a,b){return Math.floor(Math.random()*(b-a)+a);}
 
-function draw() {
-    ctx.fillStyle = "rgba(0,0,0,0.05)";
-    ctx.fillRect(0, 0,
+function ip(){
+return `${rand(10,255)}.${rand(0,255)}.${rand(0,255)}.${rand(0,255)}`;
+}
+
+function device(){
+const arr=["Samsung","Vivo","iPhone","Huawei","Xiaomi"];
+return arr[rand(0,arr.length)];
+}
+
+function user(){
+let name = navigator.userAgent;
+return name.includes("Android") ? "android_user" :
+       name.includes("iPhone") ? "iphone_user" :
+       "guest_"+rand(1000,9999);
+}
+
+function locationFake(){
+let lang = navigator.language;
+if(lang.includes("ru")) return "Russia";
+if(lang.includes("en")) return "USA";
+if(lang.includes("de")) return "Germany";
+return "Unknown";
+}
+
+// ===== TERMINAL =====
+const term=document.getElementById("terminal");
+
+function type(text,cb){
+let i=0;
+let int=setInterval(()=>{
+term.innerHTML+=text[i];
+i++;
+if(i>=text.length){
+clearInterval(int);
+term.innerHTML+="\n";
+cb&&cb();
+}
+},30);
+}
+
+// ===== СТАРТ =====
+type("[SYSTEM START]",()=>{
+type("[CONNECTING...]",()=>{
+setTimeout(start,500);
+});
+});
+
+function start(){
+alarm.play();
+
+type("[TARGET FOUND]",()=>{
+type("[USERNAME: "+user()+"]",()=>{
+type("[DEVICE: "+device()+"]",()=>{
+type("[LOCATION: "+locationFake()+"]",()=>{
+type("[IP: "+ip()+"]",()=>{
+type("[ACCESS CAMERA...]",()=>{
+document.getElementById("cameraBox").style.display="block";
+type("[CAMERA ONLINE]",()=>{
+hack();
+});
+});
+});
+});
+});
+});
+}
+
+// ===== ВЗЛОМ =====
+function hack(){
+let p=0;
+let int=setInterval(()=>{
+p+=5;
+term.innerHTML+=`[HACKING ${p}%]\n`;
+if(p>=100){
+clearInterval(int);
+files();
+}
+},100);
+}
+
+// ===== ФАЙЛЫ =====
+function files(){
+type("[SCANNING FILES...]",()=>{
+type("[FOUND: photos.zip]",()=>{
+type("[FOUND: passwords.txt]",()=>{
+type("[FOUND: chats.log]",()=>{
+download();
+});
+});
+});
+});
+}
+
+function download(){
+let p=0;
+let int=setInterval(()=>{
+p+=10;
+term.innerHTML+=`[DOWNLOADING DATA ${p}%]\n`;
+if(p>=100){
+clearInterval(int);
+finish();
+}
+},120);
+}
+
+// ===== ФИНАЛ =====
+function finish(){
+document.getElementById("alertMsg").style.display="block";
+
+let t=10;
+let timer=document.getElementById("timer");
+
+let int=setInterval(()=>{
+timer.innerHTML="TIME LEFT: "+t;
+t--;
+if(t<0) clearInterval(int);
+},1000);
+
+type("[ACCESS GRANTED]",()=>{
+type("[ALL DATA STORED]",()=>{
+beep.play();
+});
+});
+}
+</script>
+
+</body>
+</html>
